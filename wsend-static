@@ -1,0 +1,58 @@
+#!/bin/bash
+#
+# first make the temporary html file
+cp "$1" "ws_temp_$1"
+wstemp="ws_temp_$1"
+
+#
+# next find the js files
+#
+
+jshtmlarr=( $(cat $1 | grep src | grep .js | tr '"' '\n' | tr "'" "\n" | grep js) )
+jslength=${#jshtmlarr[@]}
+for (( i=0; i<$jslength; i++ )); do
+  jsfile[$i]=$($HOME/.wsend/wsend ${jshtmlarr[$i]})
+  echo "${jshtmlarr[$i]}/${jsfile[$i]}"
+  sed -i '' "s#${jshtmlarr[$i]}#${jsfile[$i]}#g" "$wstemp"
+done
+
+#
+# then find the css files
+#
+
+csshtmlarr=( $(cat $1 | grep href | grep .css | tr '"' '\n' | tr "'" "\n" | grep css) )
+csslength=${#csshtmlarr[@]}
+for (( i=0; i<$csslength; i++ )); do
+  cssfile[$i]=$($HOME/.wsend/wsend ${csshtmlarr[$i]})
+  echo "${csshtmlarr[$i]}/${cssfile[$i]}"
+  sed -i '' "s#${csshtmlarr[$i]}#${cssfile[$i]}#g" "$wstemp"
+  cssContentsArr=( $(cat ${csshtmlarr[$i]} | grep url | grep src | tr ',; ' '\n' | grep url | sed 's/url//g' | sed "s/('//g" | sed "s/')//g" | sed 's/("//g' | sed 's/")//g' | sed 's/?.*//g' | sed 's/#.*//g') )
+
+done
+
+
+
+#
+# then find the png files
+#
+
+pnghtmlarr=( $(cat $1 | grep img | grep src | grep .png | tr '"' '\n' | tr "'" "\n" | grep png) )
+pnglength=${#pnghtmlarr[@]}
+for (( i=0; i<$pnglength; i++ )); do
+  pngfile[$i]=$($HOME/.wsend/wsend ${pnghtmlarr[$i]})
+  echo "${pnghtmlarr[$i]}/${pngfile[$i]}"
+  sed -i '' "s#${pnghtmlarr[$i]}#${pngfile[$i]}#g" "$wstemp"
+done
+
+
+#
+# then find the jpg files
+#
+
+jpghtmlarr=( $(cat $1 | grep img | grep src | grep .jpg | tr '"' '\n' | tr "'" "\n" | grep jpg) )
+jpglength=${#jpghtmlarr[@]}
+for (( i=0; i<$jpglength; i++ )); do
+  jpgfile[$i]=$($HOME/.wsend/wsend ${jpghtmlarr[$i]})
+  echo "${jpghtmlarr[$i]}/${jpgfile[$i]}"
+  sed -i '' "s#${jpghtmlarr[$i]}#${jpgfile[$i]}#g" "$wstemp"
+done
