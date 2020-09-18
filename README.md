@@ -1,4 +1,4 @@
-wsend-static
+wsend-page
 ============
 
 Static Site Generator using wsend
